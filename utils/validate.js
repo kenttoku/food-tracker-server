@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const validateId = function(req, res, next) {
   const { id } = req.params;
-  console.log(id);
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
     err.status = 400;
@@ -21,7 +20,53 @@ const validateName = function(req, res, next) {
   return next();
 };
 
+const validateDate = function(req, res, next) {
+  const { year, month, day } = req.body;
+  if (!year) {
+    const err = new Error('Missing `year` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!month) {
+    const err = new Error('Missing `year` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!day) {
+    const err = new Error('Missing `year` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  if (!isValid(year, month, day)) {
+    const err = new Error('Invalid `year/month/day` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  return next();
+};
+
+function daysInMonth(month, year) {
+  // month is 0-indexed
+  switch (month) {
+    case 1 :
+      return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28;
+    case 8 : case 3 : case 5 : case 10 :
+      return 30;
+    default :
+      return 31;
+  }
+}
+
+function isValid(year, month, day) {
+  return month >= 0 && month < 12 && day > 0 && day <= daysInMonth(month, year);
+}
+
 module.exports = {
   validateId,
-  validateName
+  validateName,
+  validateDate
 };

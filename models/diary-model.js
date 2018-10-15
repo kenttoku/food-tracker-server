@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const diarySchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  date: Date,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  date: { type: Date, required: true, unique: true },
   entries: [{
     foodId: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' },
     count: Number

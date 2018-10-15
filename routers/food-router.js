@@ -35,7 +35,7 @@ router.get('/:id', validateId, (req, res, next) => {
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', validateName, (req, res, next) => {
   const userId = req.user.id;
-  const newFood ={ userId, ...req.body };
+  const newFood = { ...req.body, userId };
 
   return Food.create(newFood)
     .then(result => {
@@ -54,7 +54,7 @@ router.post('/', validateName, (req, res, next) => {
 router.put('/:id', validateId, validateName, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
-  const newFood = { userId, ...req.body };
+  const newFood = { ...req.body, userId };
 
   return Food.findOneAndUpdate({ _id: id, userId }, newFood, { new: true })
     .then(result => {

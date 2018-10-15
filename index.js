@@ -8,6 +8,7 @@ const passport = require('passport');
 const { PORT, CLIENT_ORIGIN, MONGODB_URI } = require('./config');
 
 const authRouter = require('./routers/auth-router');
+const diariesRouter = require('./routers/diaries-router');
 const foodRouter = require('./routers/food-router');
 const usersRouter = require('./routers/users-router');
 
@@ -27,6 +28,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRouter);
+app.use('/api/diaries', diariesRouter);
 app.use('/api/food', foodRouter);
 app.use('/api/users', usersRouter);
 
