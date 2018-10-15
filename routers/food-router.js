@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const Food = require('../models/food-model');
+const { validateId, validateName } = require('../utils/validate');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -20,60 +21,34 @@ router.get('/:id', (req, res, next) => {
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
-router.post('/', (req, res, next) => {
-  const {
-    name,
-    fruits,
-    vegetables,
-    wholeGrains,
-    leanProteins,
-    nutsAndSeeds,
-    dairy,
-    refinedGrains,
-    fattyProteins,
-    sweets,
-    friedFoods
-  } = req.body;
-
+router.post('/', validateName, (req, res, next) => {
   const userId = req.user.id;
+  const newFood ={ userId, ...req.body };
 
-  if (!name) {
-    const err = new Error('Missing `name` in request body');
-    err.status = 400;
-    return next(err);
-  }
-
-  const newFood ={
-    name,
-    userId,
-    fruits,
-    vegetables,
-    wholeGrains,
-    leanProteins,
-    nutsAndSeeds,
-    dairy,
-    refinedGrains,
-    fattyProteins,
-    sweets,
-    friedFoods
-  };
-
-  return Food
-    .create(newFood)
-    .then(food => {
-      if (food) {
+  return Food.create(newFood)
+    .then(result => {
+      if (result) {
         res.status(201)
-          .location(`${req.originalUrl}/${food.id}`)
-          .json(food.serialize());
+          .location(`${req.originalUrl}/${result.id}`)
+          .json(result.serialize());
       } else {
         next();
       }
-    });
+    })
+    .catch(err => next(err));
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
-  return res.json({ message: 'item updated' });
+router.put('/:id', validateId, validateName, (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const newFood = { userId, ...req.body };
+
+  return Food.findOneAndUpdate({ _id: id }, newFood, { new: true })
+    .then(result => {
+      result ? res.json(result.serialize()) : next();
+    })
+    .catch(err => next(err));
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
