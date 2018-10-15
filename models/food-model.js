@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const foodSchema = new mongoose.Schema({
-  name: { type: String, required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  name: { type: String, required: true },
   fruits: { type: Number, default: 0 },
   vegetables: { type: Number, default: 0 },
   wholeGrains: { type: Number, default: 0 },
@@ -20,8 +20,8 @@ foodSchema.set('timestamps', true);
 foodSchema.methods.serialize = function() {
   return {
     id: this.id,
-    name: this.name,
     userId: this.userId,
+    name: this.name,
     fruits: this.fruits,
     vegetables: this.vegetables,
     wholeGrains: this.wholeGrains,
