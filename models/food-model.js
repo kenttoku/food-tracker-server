@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
 const foodSchema = new mongoose.Schema({
-  name: String,
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  name: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   fruit: { type: Number, default: 0 },
   vegetable: { type: Number, default: 0 },
   wholeGrain: { type: Number, default: 0 },

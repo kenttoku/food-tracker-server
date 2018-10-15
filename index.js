@@ -6,12 +6,16 @@ const morgan = require('morgan');
 const passport = require('passport');
 
 const { PORT, CLIENT_ORIGIN, MONGODB_URI } = require('./config');
-const usersRouter = require('./routers/users-router');
+
 const authRouter = require('./routers/auth-router');
+const foodRouter = require('./routers/food-router');
+const usersRouter = require('./routers/users-router');
+
 const localStrategy = require('./passport/local-strategy');
 const jwtStrategy = require('./passport/jwt-strategy');
 
 const app = express();
+
 // Passport Related
 passport.use(localStrategy);
 passport.use(jwtStrategy);
@@ -22,8 +26,9 @@ app.use(cors({ origin: CLIENT_ORIGIN }));
 app.use(express.json());
 
 // Routes
-app.use('/api/users', usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/food', foodRouter);
+app.use('/api/users', usersRouter);
 
 if (require.main === module) {
   mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
