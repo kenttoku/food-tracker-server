@@ -44,7 +44,7 @@ router.put('/:id', validateId, validateName, (req, res, next) => {
   const userId = req.user.id;
   const newFood = { userId, ...req.body };
 
-  return Food.findOneAndUpdate({ _id: id }, newFood, { new: true })
+  return Food.findOneAndUpdate({ _id: id, userId }, newFood, { new: true })
     .then(result => {
       result ? res.json(result.serialize()) : next();
     })
@@ -52,8 +52,13 @@ router.put('/:id', validateId, validateName, (req, res, next) => {
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
-  return res.json({ message: 'item deleted' });
+router.delete('/:id', validateId, (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  return Food.findOneAndRemove({ _id: id, userId })
+    .then(() => res.sendStatus(204))
+    .catch(err => next(err));
 });
 
 module.exports = router;
