@@ -1,6 +1,5 @@
 const express = require('express');
 const passport = require('passport');
-const mongoose = require('mongoose');
 
 const router = express.Router();
 
@@ -24,8 +23,13 @@ router.get('/', (req, res, next) => {
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
-  return res.json({ message: 'one item' });
+router.get('/:id', validateId, (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  return Food.findOne({ _id: id, userId })
+    .then(result => result ? res.json(result.serialize()) : next())
+    .catch(err => next(err));
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
