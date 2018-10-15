@@ -12,7 +12,15 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  return res.json({ message: 'all items' });
+  const userId = req.user.id;
+  let filter = { userId };
+
+  return Food.find(filter)
+    .sort({ updatedAt: 'desc' })
+    .then(results => {
+      results ? res.json(results.map(result => result.serialize())) : next();
+    })
+    .catch(err => next(err));
 });
 
 /* ========== GET/READ A SINGLE ITEM ========== */

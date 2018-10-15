@@ -15,6 +15,8 @@ const foodSchema = new mongoose.Schema({
   friedFoods: { type: Number, default: 0 }
 });
 
+foodSchema.set('timestamps', true);
+
 foodSchema.methods.serialize = function() {
   return {
     id: this.id,
