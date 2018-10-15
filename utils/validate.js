@@ -40,7 +40,7 @@ const validateDate = function(req, res, next) {
     return next(err);
   }
 
-  if (!isValid(year, month, day)) {
+  if (!isValidDate(year, month, day)) {
     const err = new Error('Invalid `year/month/day` in request body');
     err.status = 400;
     return next(err);
@@ -51,7 +51,7 @@ const validateDate = function(req, res, next) {
 
 function daysInMonth(month, year) {
   // month is 0-indexed
-  switch (month) {
+  switch (month-1) {
     case 1 :
       return (year % 4 === 0 && year % 100) || year % 400 === 0 ? 29 : 28;
     case 8 : case 3 : case 5 : case 10 :
@@ -61,8 +61,8 @@ function daysInMonth(month, year) {
   }
 }
 
-function isValid(year, month, day) {
-  return month >= 0 && month < 12 && day > 0 && day <= daysInMonth(month, year);
+function isValidDate(year, month, day) {
+  return month > 0 && month <= 12 && day > 0 && day <= daysInMonth(month, year);
 }
 
 module.exports = {

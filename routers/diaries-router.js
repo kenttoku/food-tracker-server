@@ -10,19 +10,28 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 /* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
-  return res.json({ message: 'all items' });
-});
+  const userId = req.user.id;
+  const filter = { userId };
+  const { year, month, day } = req.query;
+  if (year && month && day) {
+    filter.date = new Date(year, month-1, day);
+  } else if (year && month) {
+    // Add filter to get whole month
+  }
 
-/* ========== GET/READ A SINGLE ITEM ========== */
-router.get('/:id', (req, res, next) => {
-  return res.json({ message: 'one item' });
+  return Diary.find(filter)
+    .sort({ updatedAt: 'desc' })
+    .then(results => {
+      results ? res.json(results.map(result => result.serialize())) : next();
+    })
+    .catch(err => next(err));
 });
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', validateDate, (req, res, next) => {
   const userId = req.user.id;
   const { year, month, day } = req.body;
-  const date = new Date(year, month, day);
+  const date = new Date(year, month-1, day);
 
   const newDiary = {  ...req.body, userId, date };
 
@@ -45,14 +54,14 @@ router.post('/', validateDate, (req, res, next) => {
     });
 });
 
-/* ========== PUT/UPDATE A SINGLE ITEM ========== */
-router.put('/:id', (req, res, next) => {
-  return res.json({ message: 'item updated' });
-});
+/* ========== /UPDATE A SINGLE ITEM ========== */
+router.patch('/:id', validateId, (req, res, next) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+  const { entries = [] } = req.body;
 
-/* ========== DELETE/REMOVE A SINGLE ITEM ========== */
-router.delete('/:id', (req, res, next) => {
-  return res.json({ message: 'item deleted' });
+  // TODO: Update diary entries
+  return Diary.findOneAndUpdate({ _id: id, userId });
 });
 
 module.exports = router;

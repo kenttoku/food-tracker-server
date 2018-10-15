@@ -5,7 +5,8 @@ const diarySchema = new mongoose.Schema({
   date: { type: Date, required: true, unique: true },
   entries: [{
     foodId: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' },
-    count: Number
+    servings: Number,
+    meal: String
   }],
 });
 
