@@ -6,15 +6,22 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true }
 });
 
-userSchema.set('toObject', {
-  virtuals: true,
-  versionKey: false,
-  transform: (doc, ret) => {
-    delete ret._id;
-    delete ret.__v;
-    delete ret.password;
-  }
-});
+// userSchema.set('toObject', {
+//   virtuals: true,
+//   versionKey: false,
+//   transform: (doc, ret) => {
+//     delete ret._id;
+//     delete ret.__v;
+//     delete ret.password;
+//   }
+// });
+
+userSchema.methods.serialize = function() {
+  return {
+    id: this.id,
+    username: this.username
+  };
+};
 
 userSchema.methods.validatePassword = function(password) {
   return bcrypt.compare(password, this.password);

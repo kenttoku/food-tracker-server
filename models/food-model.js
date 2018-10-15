@@ -15,4 +15,22 @@ const foodSchema = new mongoose.Schema({
   friedFoods: { type: Number, default: 0 }
 });
 
+foodSchema.methods.serialize = function() {
+  return {
+    id: this.id,
+    name: this.name,
+    userId: this.userId,
+    fruits: this.fruits,
+    vegetables: this.vegetables,
+    wholeGrains: this.wholeGrains,
+    leanProteins: this.leanProteins,
+    nutsAndSeeds: this.nutsAndSeeds,
+    dairy: this.dairy,
+    refinedGrains: this.refinedGrains,
+    fattyProteins: this.fattyProteins,
+    sweets: this.sweets,
+    friedFoods: this.friedFoods
+  };
+};
+
 module.exports = mongoose.model('Food', foodSchema);

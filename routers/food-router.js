@@ -34,6 +34,7 @@ router.post('/', (req, res, next) => {
     sweets,
     friedFoods
   } = req.body;
+
   const userId = req.user.id;
 
   if (!name) {
@@ -41,7 +42,33 @@ router.post('/', (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-  return res.json({ message: 'item created' });
+
+  const newFood ={
+    name,
+    userId,
+    fruits,
+    vegetables,
+    wholeGrains,
+    leanProteins,
+    nutsAndSeeds,
+    dairy,
+    refinedGrains,
+    fattyProteins,
+    sweets,
+    friedFoods
+  };
+
+  return Food
+    .create(newFood)
+    .then(food => {
+      if (food) {
+        res.status(201)
+          .location(`${req.originalUrl}/${food.id}`)
+          .json(food.serialize());
+      } else {
+        next();
+      }
+    });
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
