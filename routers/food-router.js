@@ -21,6 +21,26 @@ router.get('/:id', (req, res, next) => {
 
 /* ========== POST/CREATE AN ITEM ========== */
 router.post('/', (req, res, next) => {
+  const {
+    name,
+    fruits,
+    vegetables,
+    wholeGrains,
+    leanProteins,
+    nutsAndSeeds,
+    dairy,
+    refinedGrains,
+    fattyProteins,
+    sweets,
+    friedFoods
+  } = req.body;
+  const userId = req.user.id;
+
+  if (!name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
   return res.json({ message: 'item created' });
 });
 
