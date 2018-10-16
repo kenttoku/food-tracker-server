@@ -17,8 +17,8 @@ const diarySchema = new mongoose.Schema({
       sweets: { type: Number, default: 0 },
       friedFoods: { type: Number, default: 0 }
     },
-    servings: Number,
-    meal: String
+    // servings: Number,
+    // meal: String
   }],
 });
 
