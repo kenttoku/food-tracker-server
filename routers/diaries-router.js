@@ -16,6 +16,7 @@ router.post('/', validateDate, (req, res, next) => {
 
   return Diary.findOne(filter)
     .then(result => {
+      console.log(result);
       if (result) {
         return res.json(result.serialize());
       } else {
@@ -32,18 +33,21 @@ router.post('/', validateDate, (req, res, next) => {
       }
     })
     .catch(err => next(err));
-
-
 });
 
 /* ========== /UPDATE A SINGLE ITEM ========== */
-router.patch('/:yyyymmdd', validateId, (req, res, next) => {
+router.patch('/:yyyymmdd', (req, res, next) => {
   const { yyyymmdd } = req.params;
   const userId = req.user.id;
-  const { entries = [] } = req.body;
+  let { entries = [] } = req.body;
 
-  // TODO: Update diary entries
-  return Diary.findOneAndUpdate({ yyyymmdd: yyyymmdd, userId });
+  console.log('==================================');
+  console.log(entries);
+  return Diary.findOneAndUpdate(
+    { yyyymmdd, userId },
+    { $set: { entries } },
+    { new:true }
+  ).then(result => res.json(result.populate().serialize()));
 });
 
 module.exports = router;

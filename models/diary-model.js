@@ -2,13 +2,27 @@ const mongoose = require('mongoose');
 
 const diarySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  yyyymmdd:  { type: Number, required: true, unique: true },
+  yyyymmdd:  { type: Number, required: true },
   entries: [{
-    foodId: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' },
+    food: {
+      name: { type: String, required: true },
+      fruits: { type: Number, default: 0 },
+      vegetables: { type: Number, default: 0 },
+      wholeGrains: { type: Number, default: 0 },
+      leanProteins: { type: Number, default: 0 },
+      nutsAndSeeds: { type: Number, default: 0 },
+      dairy: { type: Number, default: 0 },
+      refinedGrains: { type: Number, default: 0 },
+      fattyProteins: { type: Number, default: 0 },
+      sweets: { type: Number, default: 0 },
+      friedFoods: { type: Number, default: 0 }
+    },
     servings: Number,
     meal: String
   }],
 });
+
+diarySchema.index({ yyyymmdd: 1, userId: 1 }, { unique: true });
 
 diarySchema.methods.serialize = function() {
   return {
