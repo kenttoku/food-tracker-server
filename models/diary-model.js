@@ -16,9 +16,7 @@ const diarySchema = new mongoose.Schema({
       fattyProteins: { type: Number, default: 0 },
       sweets: { type: Number, default: 0 },
       friedFoods: { type: Number, default: 0 }
-    },
-    // servings: Number,
-    // meal: String
+    }
   }],
 });
 
