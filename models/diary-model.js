@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { combineFood } = require('../utils/points');
 
 const diarySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -27,7 +28,8 @@ diarySchema.methods.serialize = function() {
     id: this.id,
     userId: this.userId,
     yyyymmdd: this.yyyymmdd,
-    entries: this.entries
+    entries: this.entries,
+    combined: combineFood(this.entries)
   };
 };
 

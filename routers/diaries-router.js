@@ -4,7 +4,7 @@ const passport = require('passport');
 const router = express.Router();
 
 const Diary = require('../models/diary-model');
-const { validateId, validateDate } = require('../utils/validate');
+const { validateDate } = require('../utils/validate');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
@@ -24,7 +24,6 @@ router.post('/', validateDate, (req, res, next) => {
 
   return Diary.findOne(filter)
     .then(result => {
-      console.log(result);
       if (result) {
         return res.json(result.serialize());
       } else {
@@ -49,13 +48,13 @@ router.patch('/:yyyymmdd', (req, res, next) => {
   const userId = req.user.id;
   let { entries = [] } = req.body;
 
-  console.log('==================================');
-  console.log(entries);
   return Diary.findOneAndUpdate(
     { yyyymmdd, userId },
     { $set: { entries } },
     { new:true }
-  ).then(result => res.json(result.populate().serialize()));
+  )
+    .then(result => res.json(result.populate().serialize()))
+    .catch(err => next(err));
 });
 
 module.exports = router;
