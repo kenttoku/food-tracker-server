@@ -20,6 +20,16 @@ const validateName = function(req, res, next) {
   return next();
 };
 
+const validateNewUsermame = function(req, res, next) {
+  const { newUsername } = req.body;
+  if (!newUsername) {
+    const err = new Error('Missing `newUsername` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  return next();
+};
+
 const validateDate = function(req, res, next) {
   const { yyyymmdd } = req.body;
   if (!yyyymmdd) {
@@ -111,5 +121,6 @@ module.exports = {
   validateId,
   validateName,
   validateDate,
-  validateUserFields
+  validateUserFields,
+  validateNewUsermame
 };

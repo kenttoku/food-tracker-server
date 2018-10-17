@@ -1,9 +1,10 @@
 const express = require('express');
 const passport = require('passport');
+const createAuthToken = require('../utils/token');
 
 const router = express.Router();
 const User = require('../models/user-model');
-const { validateId, validateUserFields } = require('../utils/validate');
+const { validateNewUsermame, validateUserFields } = require('../utils/validate');
 
 router.post('/', validateUserFields, (req, res, next) => {
   const { username, password } = req.body;
@@ -30,21 +31,23 @@ router.post('/', validateUserFields, (req, res, next) => {
     });
 });
 
-router.put('/', passport.authenticate('jwt', { session: false, failWithError: true }), validateUserFields, (req, res, next) => {
-  console.log('running');
-  const { password } = req.body;
+router.patch('/', passport.authenticate('local', { session: false, failWithError: true }), validateNewUsermame, (req, res, next) => {
+  const { newUsername, goal, email } = req.body;
   const { id } = req.user;
+  const newValues = {
+    username: newUsername,
+    goal,
+    email
+  };
 
-  return User.hashPassword(password)
-    .then(digest => {
-      const updatedUser = {
-        ...req.body,
-        password: digest
-      };
-      return User.findOneAndUpdate({ _id: id }, updatedUser, { new: true });
-    })
+  return User.findOneAndUpdate({ _id: id },  { $set: newValues }, { new: true })
     .then(result => {
-      result ? res.json(result.serialize()) : next();
+      if (result) {
+        const authToken = createAuthToken(result.serialize());
+        return res.json(authToken);
+      } else {
+        next();
+      }
     })
     .catch(err => {
       if (err.code === 11000) {
