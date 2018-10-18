@@ -4,7 +4,10 @@ const createAuthToken = require('../utils/token');
 
 const router = express.Router();
 const User = require('../models/user-model');
-const { validateNewUsermame, validateUserFields } = require('../utils/validate');
+const {
+  validateNewUsermame,
+  validateUserFields
+} = require('../utils/validate');
 
 router.post('/', validateUserFields, (req, res, next) => {
   const { username, password } = req.body;

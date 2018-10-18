@@ -12,7 +12,6 @@ const pointsTable = {
 };
 
 const combineFood = (entries) => {
-  console.log(entries);
   const combinedFood = {
     fruits: 0,
     vegetables: 0,
@@ -44,13 +43,25 @@ const combineFood = (entries) => {
 const calculatePoints = (entries) => {
   const combined = combineFood(entries);
   let points = 0;
-  const categories = ['fruits', 'vegetables', 'wholeGrains', 'leanProteins', 'nutsAndSeeds', 'dairy', 'refinedGrains', 'fattyProteins', 'sweets', 'friedFoods'];
+  const categories = [
+    'fruits',
+    'vegetables',
+    'wholeGrains',
+    'leanProteins',
+    'nutsAndSeeds',
+    'dairy',
+    'refinedGrains',
+    'fattyProteins',
+    'sweets',
+    'friedFoods'
+  ];
   categories.forEach(category => {
     const servings = Math.trunc(combined[category]);
     if (servings <= 6) {
       points += pointsTable[category][servings];
     } else {
-      points += pointsTable[category][6] + pointsTable[category][7] * (servings - 6);
+      points += pointsTable[category][6];
+      points += pointsTable[category][7] * (servings - 6);
     }
   });
 
