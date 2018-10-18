@@ -62,4 +62,4 @@ if (require.main === module) {
   }).on('error', err => console.error(err));
 }
 
-module.exports = { app };
+module.exports = app;
