@@ -31,9 +31,9 @@ const validateNewUsermame = function(req, res, next) {
 };
 
 const validateDate = function(req, res, next) {
-  const { yyyymmdd } = req.body;
+  const { yyyymmdd } = req.params;
   if (!yyyymmdd) {
-    const err = new Error('Missing `yyyymmdd` in request body');
+    const err = new Error('Missing `yyyymmdd` in request params');
     err.status = 400;
     return next(err);
   }
@@ -42,7 +42,7 @@ const validateDate = function(req, res, next) {
   const month = Math.trunc(yyyymmdd / 100) % 100;
 
   if (day < 1 || day > 31 || month < 1 || month > 12 || isNaN(yyyymmdd)) {
-    const err = new Error('Invalid `yyyymmdd` in request body');
+    const err = new Error('Invalid `yyyymmdd` in request params');
     err.status = 400;
     return next(err);
   }
