@@ -211,6 +211,24 @@ describe('Food Tracker API - Users', function() {
             expect(payload.user.username).to.equal('newUserName');
           });
       });
+
+      it('should not change username if there is a duplicate', function() {
+        const testUser = { username, password };
+        return chai.request(app).post('/api/users').send(testUser)
+          .then(() => {
+            return chai.request(app)
+              .patch('/api/users')
+              .send({
+                username: anotherUser,
+                password: anotherPass,
+                newUsername: username
+              });
+          })
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res.body.message).to.equal('The username already exists');
+          });
+      });
     });
   });
 });
