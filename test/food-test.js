@@ -144,6 +144,21 @@ describe('Food Tracker API - Food', () => {
         });
     });
 
+
+    it('should not return for invalid id', () => {
+      return Food.findOne({ userId: user.id })
+        .then(() => {
+          return chai.request(app).get('/api/food/INVALID')
+            .set('Authorization', `Bearer ${token}`);
+        })
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+        });
+    });
+
+
     it('should catch errors and respond properly', () => {
       sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
 
@@ -204,6 +219,20 @@ describe('Food Tracker API - Food', () => {
           expect(new Date(body.updatedAt)).to.eql(data.updatedAt);
         });
     });
+
+    it('should throw an error for food without a name', () => {
+      const newItem = {};
+      return chai.request(app)
+        .post('/api/food')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newItem)
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+        });
+    });
+
 
     it('should catch errors and respond properly', () => {
       sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
