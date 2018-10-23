@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 
 const validateId = function(req, res, next) {
   const { id } = req.params;
@@ -32,16 +33,8 @@ const validateNewUsermame = function(req, res, next) {
 
 const validateDate = function(req, res, next) {
   const { yyyymmdd } = req.params;
-  if (!yyyymmdd) {
-    const err = new Error('Missing `yyyymmdd` in request params');
-    err.status = 400;
-    return next(err);
-  }
 
-  const day = yyyymmdd % 100;
-  const month = Math.trunc(yyyymmdd / 100) % 100;
-
-  if (day < 1 || day > 31 || month < 1 || month > 12 || isNaN(yyyymmdd)) {
+  if (moment(yyyymmdd, 'YYYYMMDD').format() === 'Invalid date') {
     const err = new Error('Invalid `yyyymmdd` in request params');
     err.status = 400;
     return next(err);

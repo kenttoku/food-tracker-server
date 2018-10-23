@@ -152,6 +152,22 @@ describe('Food Tracker API - Diaries', () => {
         });
     });
 
+    it('should throw an error for invalid date', () => {
+      const updateField = { entries: [] };
+      return Diary.findOne({ userId: user.id })
+        .then(() => {
+          return chai.request(app)
+            .patch('/api/diaries/20003030')
+            .set('Authorization', `Bearer ${token}`)
+            .send(updateField);
+        })
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+        });
+    });
+
     it('should catch errors and respond properly', () => {
       sandbox.stub(Diary.schema.options.toJSON, 'transform').throws('FakeError');
       const updateField = { entries: [] };
