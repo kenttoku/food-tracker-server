@@ -91,6 +91,19 @@ describe('Noteful API - Food', () => {
           });
         });
     });
+
+    it('should catch errors and respond properly', () => {
+      sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
+
+      return chai.request(app).get('/api/food')
+        .set('Authorization', `Bearer ${token}`)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Internal Server Error');
+        });
+    });
   });
 
   describe('GET /api/food/:id', () => {
@@ -128,6 +141,24 @@ describe('Noteful API - Food', () => {
           expect(res.body.userId).to.equal(data.userId.toString());
           expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
           expect(new Date(res.body.updatedAt)).to.eql(data.updatedAt);
+        });
+    });
+
+    it('should catch errors and respond properly', () => {
+      sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
+
+      let data;
+      return Food.findOne({ userId: user.id })
+        .then(_data => {
+          data = _data;
+          return chai.request(app).get(`/api/food/${data.id}`)
+            .set('Authorization', `Bearer ${token}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Internal Server Error');
         });
     });
   });
@@ -173,6 +204,22 @@ describe('Noteful API - Food', () => {
           expect(new Date(body.updatedAt)).to.eql(data.updatedAt);
         });
     });
+
+    it('should catch errors and respond properly', () => {
+      sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
+
+      const newItem = { name: 'newFood' };
+      return chai.request(app)
+        .post('/api/food')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newItem)
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Internal Server Error');
+        });
+    });
   });
 
   describe('PUT /api/food/:id', () => {
@@ -216,6 +263,27 @@ describe('Noteful API - Food', () => {
           expect(new Date(res.body.updatedAt)).to.greaterThan(data.updatedAt);
         });
     });
+
+    it('should catch errors and respond properly', () => {
+      sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
+
+      const updateItem = { name: 'Updated Name' };
+      let data;
+      return Food.findOne({ userId: user.id })
+        .then(_data => {
+          data = _data;
+          return chai.request(app)
+            .put(`/api/food/${data.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send(updateItem);
+        })
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Internal Server Error');
+        });
+    });
   });
 
   describe('DELETE /api/food/:id', () => {
@@ -235,6 +303,22 @@ describe('Noteful API - Food', () => {
         })
         .then(count => {
           expect(count).to.equal(0);
+        });
+    });
+
+    it('should catch errors and respond properly', () => {
+      sandbox.stub(express.response, 'sendStatus').throws('FakeError');
+      return Food.findOne()
+        .then(data => {
+          return chai.request(app)
+            .delete(`/api/food/${data.id}`)
+            .set('Authorization', `Bearer ${token}`);
+        })
+        .then(res => {
+          expect(res).to.have.status(500);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body.message).to.equal('Internal Server Error');
         });
     });
   });
