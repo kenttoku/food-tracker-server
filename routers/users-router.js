@@ -47,7 +47,7 @@ router.patch('/', passport.authenticate('local', { session: false, failWithError
     .then(result => {
       if (result) {
         const authToken = createAuthToken(result.serialize());
-        return res.json(authToken);
+        return res.json({ authToken });
       } else {
         next();
       }

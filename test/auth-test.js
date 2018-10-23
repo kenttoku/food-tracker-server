@@ -101,6 +101,17 @@ describe('Food Tracker API - Auth', function() {
           expect(res.body.message).to.equal('Unauthorized');
         });
     });
+
+    it('Should reject requests with incorrect password', function() {
+      return chai.request(app)
+        .post('/api/auth/login')
+        .send({ username, password: 'wrongpass' })
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res.body).to.be.an('object');
+          expect(res.body.message).to.equal('Unauthorized');
+        });
+    });
   });
 
   describe('/api/auth/refresh', function() {

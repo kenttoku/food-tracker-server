@@ -2,8 +2,9 @@ const app = require('../index');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
-const { TEST_MONGODB_URI } = require('../config');
+const { TEST_MONGODB_URI, JWT_SECRET } = require('../config');
 
 const User = require('../models/user-model');
 
@@ -15,13 +16,25 @@ describe('Food Tracker API - Users', function() {
   const username = 'exampleUser';
   const password = 'examplePass';
 
+  const anotherUser = 'anotherUser';
+  const anotherPass = 'anotherPass';
+  const _id = '000000000000000000000001';
+
   before(function() {
     return mongoose.connect(TEST_MONGODB_URI)
       .then(() => mongoose.connection.db.dropDatabase());
   });
 
   beforeEach(function() {
-    return User.createIndexes();
+    return User.createIndexes()
+      .then(() => {
+        return User.hashPassword(anotherPass)
+          .then(digest => User.create({
+            _id,
+            username: anotherUser,
+            password: digest
+          }));
+      });
   });
 
   afterEach(function() {
@@ -63,7 +76,6 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-
       it('Should reject users with missing username', function() {
         const testUser = { password };
         return chai.request(app).post('/api/users').send(testUser)
@@ -86,7 +98,6 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-
       it('Should reject users with non-string username', function() {
         const testUser = { username: 123456, password };
         return chai.request(app).post('/api/users').send(testUser)
@@ -108,6 +119,7 @@ describe('Food Tracker API - Users', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with non-trimmed username', function() {
         const testUser = { username: username + '  ', password };
         return chai.request(app).post('/api/users').send(testUser)
@@ -118,6 +130,7 @@ describe('Food Tracker API - Users', function() {
             expect(res.body.location).to.equal('username');
           });
       });
+
       it('Should reject users with non-trimmed password', function() {
         const testUser = { username, password: password + '  ' };
         return chai.request(app).post('/api/users').send(testUser)
@@ -128,6 +141,7 @@ describe('Food Tracker API - Users', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with empty username', function() {
         const testUser = { username: '', password };
         return chai.request(app).post('/api/users').send(testUser)
@@ -138,6 +152,7 @@ describe('Food Tracker API - Users', function() {
             expect(res.body.location).to.equal('username');
           });
       });
+
       it('Should reject users with password less than 8 characters', function() {
         const testUser = { username, password: 'short' };
         return chai.request(app).post('/api/users').send(testUser)
@@ -148,6 +163,7 @@ describe('Food Tracker API - Users', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with password greater than 72 characters', function() {
         const longPassword = password.padEnd(73, 'a');
         const testUser = { username, password: longPassword };
@@ -159,6 +175,7 @@ describe('Food Tracker API - Users', function() {
             expect(res.body.location).to.equal('password');
           });
       });
+
       it('Should reject users with duplicate username', function() {
         const testUser = { username, password };
         return chai.request(app).post('/api/users').send(testUser)
@@ -171,7 +188,29 @@ describe('Food Tracker API - Users', function() {
           });
 
       });
+    });
 
+    describe('PATCH', function() {
+      it('should change username', function() {
+        return chai.request(app)
+          .patch('/api/users')
+          .send({
+            username: anotherUser,
+            password: anotherPass,
+            newUsername: 'newUserName'
+          })
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res.body).to.be.an('object');
+            expect(res.body.authToken).to.be.a('string');
+
+            const payload = jwt.verify(res.body.authToken, JWT_SECRET);
+
+            expect(payload.user).to.not.have.property('password');
+            expect(payload.user.id).to.equal(_id);
+            expect(payload.user.username).to.equal('newUserName');
+          });
+      });
     });
   });
 });
