@@ -8,8 +8,6 @@ const { validateId, validateName } = require('../utils/validate');
 
 router.use('/', passport.authenticate('jwt', { session: false, failWithError: true }));
 
-
-/* ========== GET/READ ALL ITEMS ========== */
 router.get('/', (req, res, next) => {
   const userId = req.user.id;
   let filter = { userId };
@@ -22,7 +20,6 @@ router.get('/', (req, res, next) => {
     .catch(err => next(err));
 });
 
-/* ========== GET/READ A SINGLE ITEM ========== */
 router.get('/:id', validateId, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
@@ -32,7 +29,6 @@ router.get('/:id', validateId, (req, res, next) => {
     .catch(err => next(err));
 });
 
-/* ========== POST/CREATE AN ITEM ========== */
 router.post('/', validateName, (req, res, next) => {
   const userId = req.user.id;
   const newFood = { ...req.body, userId };
@@ -50,7 +46,6 @@ router.post('/', validateName, (req, res, next) => {
     .catch(err => next(err));
 });
 
-/* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', validateId, validateName, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;
@@ -63,7 +58,6 @@ router.put('/:id', validateId, validateName, (req, res, next) => {
     .catch(err => next(err));
 });
 
-/* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', validateId, (req, res, next) => {
   const { id } = req.params;
   const userId = req.user.id;

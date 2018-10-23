@@ -176,14 +176,66 @@ describe('Noteful API - Food', () => {
   });
 
   describe('PUT /api/food/:id', () => {
-    it('should', () => {
+    it('should update an item', () => {
 
+      const updateItem = { name: 'Updated Name' };
+      let data;
+      return Food.findOne({ userId: user.id })
+        .then(_data => {
+          data = _data;
+          return chai.request(app)
+            .put(`/api/food/${data.id}`)
+            .set('Authorization', `Bearer ${token}`)
+            .send(updateItem);
+        })
+        .then((res) => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.have.all.keys(
+            'id',
+            'name',
+            'userId',
+            'fruits',
+            'vegetables',
+            'wholeGrains',
+            'leanProteins',
+            'nutsAndSeeds',
+            'dairy',
+            'refinedGrains',
+            'fattyProteins',
+            'sweets',
+            'friedFoods',
+            'createdAt',
+            'updatedAt'
+          );
+          expect(res.body.id).to.equal(data.id);
+          expect(res.body.name).to.equal(updateItem.name);
+          expect(res.body.userId).to.equal(data.userId.toString());
+          expect(new Date(res.body.createdAt)).to.eql(data.createdAt);
+          expect(new Date(res.body.updatedAt)).to.greaterThan(data.updatedAt);
+        });
     });
   });
 
   describe('DELETE /api/food/:id', () => {
-    it('should', () => {
-
+    it('should delete an item', () => {
+      let data;
+      return Food.findOne({ userId: user.id })
+        .then(_data => {
+          data = _data;
+          return chai.request(app)
+            .delete(`/api/food/${data.id}`)
+            .set('Authorization', `Bearer ${token}`);
+        })
+        .then((res) => {
+          expect(res).to.have.status(204);
+          expect(res.body).to.be.empty;
+          return Food.countDocuments({ _id: data.id });
+        })
+        .then(count => {
+          expect(count).to.equal(0);
+        });
     });
   });
 });
