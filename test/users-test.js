@@ -229,6 +229,19 @@ describe('Food Tracker API - Users', () => {
             expect(res.body.message).to.equal('The username already exists');
           });
       });
+
+      it('should throw an error for missing newUsername field', () => {
+        return chai.request(app)
+          .patch('/api/users')
+          .send({
+            username: anotherUser,
+            password: anotherPass,
+          })
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res.body.message).to.equal('Missing `newUsername` in request body');
+          });
+      });
     });
   });
 });
