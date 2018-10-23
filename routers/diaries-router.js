@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
   const userId = req.user.id;
   const filter = { userId };
   return Diary.find(filter)
-    .then(results => res.json(results.map(result => result.serialize())))
+    .then(results => res.json(results))
     .catch(err => next(err));
 });
 
@@ -25,12 +25,12 @@ router.get('/:yyyymmdd', validateDate, (req, res, next) => {
   return Diary.findOne(filter)
     .then(result => {
       if (result) {
-        return res.json(result.serialize());
+        return res.json(result);
       } else {
         return Diary.create(newDiary)
           .then(result => {
             if (result) {
-              res.json(result.serialize());
+              res.json(result);
             } else {
               next();
             }
@@ -40,7 +40,6 @@ router.get('/:yyyymmdd', validateDate, (req, res, next) => {
     .catch(err => next(err));
 });
 
-/* ========== /UPDATE A SINGLE ITEM ========== */
 router.patch('/:yyyymmdd', validateDate, (req, res, next) => {
   const { yyyymmdd } = req.params;
   const userId = req.user.id;
@@ -51,7 +50,7 @@ router.patch('/:yyyymmdd', validateDate, (req, res, next) => {
     { $set: { entries } },
     { new:true }
   )
-    .then(result => res.json(result.populate().serialize()))
+    .then(result => res.json(result.populate()))
     .catch(err => next(err));
 });
 

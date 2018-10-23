@@ -16,7 +16,7 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 const sandbox = sinon.createSandbox();
 
-describe('Noteful API - Food', () => {
+describe('Food Tracker API - Food', () => {
   let user;
   let token;
   before(() => {
@@ -65,7 +65,7 @@ describe('Noteful API - Food', () => {
           expect(res.body).to.be.a('array');
           expect(res.body).to.have.length(data.length);
           res.body.forEach((item, i) => {
-            expect(item).to.be.a('object');
+            expect(item).to.be.an('object');
             expect(item).to.have.all.keys(
               'id',
               'name',
@@ -100,7 +100,7 @@ describe('Noteful API - Food', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Internal Server Error');
         });
     });
@@ -157,7 +157,7 @@ describe('Noteful API - Food', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Internal Server Error');
         });
     });
@@ -176,7 +176,7 @@ describe('Noteful API - Food', () => {
           expect(res).to.have.status(201);
           expect(res).to.have.header('location');
           expect(res).to.be.json;
-          expect(body).to.be.a('object');
+          expect(body).to.be.an('object');
           expect(res.body).to.have.all.keys(
             'id',
             'name',
@@ -216,7 +216,7 @@ describe('Noteful API - Food', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Internal Server Error');
         });
     });
@@ -238,7 +238,7 @@ describe('Noteful API - Food', () => {
         .then((res) => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body).to.have.all.keys(
             'id',
             'name',
@@ -280,7 +280,7 @@ describe('Noteful API - Food', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Internal Server Error');
         });
     });
@@ -317,7 +317,7 @@ describe('Noteful API - Food', () => {
         .then(res => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
+          expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Internal Server Error');
         });
     });

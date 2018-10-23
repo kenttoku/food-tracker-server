@@ -17,14 +17,6 @@ const foodSchema = new mongoose.Schema({
 
 foodSchema.set('timestamps', true);
 
-foodSchema.set('toObject', {
-  virtuals: true,
-  transform: (doc, result) => {
-    delete result._id;
-    delete result.__v;
-  }
-});
-
 foodSchema.set('toJSON', {
   virtuals: true,
   transform: (doc, result) => {

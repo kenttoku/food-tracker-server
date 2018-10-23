@@ -23,15 +23,20 @@ const diarySchema = new mongoose.Schema({
 
 diarySchema.index({ yyyymmdd: 1, userId: 1 }, { unique: true });
 
-diarySchema.methods.serialize = function() {
-  return {
-    id: this.id,
-    userId: this.userId,
-    yyyymmdd: this.yyyymmdd,
-    entries: this.entries,
-    combined: combineFood(this.entries),
-    points: calculatePoints(this.entries)
-  };
-};
+diarySchema.set('toJSON', {
+  virtuals: true,
+  transform: (doc, result) => {
+    delete result._id;
+    delete result.__v;
+  }
+});
+
+diarySchema.virtual('combined').get(function() {
+  return combineFood(this.entries);
+});
+
+diarySchema.virtual('points').get(function() {
+  return calculatePoints(this.entries);
+});
 
 module.exports = mongoose.model('Diary', diarySchema);
