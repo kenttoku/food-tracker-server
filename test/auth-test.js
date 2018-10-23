@@ -11,18 +11,18 @@ const User = require('../models/user-model');
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('Food Tracker API - Auth', function() {
+describe('Food Tracker API - Auth', () => {
 
   let token;
   const _id = '000000000000000000000001';
   const username = 'exampleUser';
   const password = 'examplePass';
 
-  before(function() {
+  before(() => {
     return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true });
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     return User.hashPassword(password)
       .then(digest => User.create({
         _id,
@@ -31,17 +31,17 @@ describe('Food Tracker API - Auth', function() {
       }));
   });
 
-  afterEach(function() {
+  afterEach(() => {
     return User.deleteMany();
   });
 
-  after(function() {
+  after(() => {
     return mongoose.connection.db.dropDatabase()
       .then(() => mongoose.disconnect());
   });
 
-  describe('Food Tracker /api/auth/login', function() {
-    it('Should return a valid auth token', function() {
+  describe('Food Tracker /api/auth/login', () => {
+    it('Should return a valid auth token', () => {
       return chai.request(app)
         .post('/api/auth/login')
         .send({ username, password })
@@ -58,7 +58,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('Should reject requests without credentials', function() {
+    it('Should reject requests without credentials', () => {
       return chai.request(app)
         .post('/api/auth/login')
         .send({})
@@ -69,7 +69,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('Should reject requests with empty string username', function() {
+    it('Should reject requests with empty string username', () => {
       return chai.request(app)
         .post('/api/auth/login')
         .send({ username: '', password })
@@ -80,7 +80,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('Should reject requests with empty string password', function() {
+    it('Should reject requests with empty string password', () => {
       return chai.request(app)
         .post('/api/auth/login')
         .send({ username, password: '' })
@@ -91,7 +91,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('Should reject requests with incorrect username', function() {
+    it('Should reject requests with incorrect username', () => {
       return chai.request(app)
         .post('/api/auth/login')
         .send({ username: 'wrongUsername', password: 'password' })
@@ -102,7 +102,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('Should reject requests with incorrect password', function() {
+    it('Should reject requests with incorrect password', () => {
       return chai.request(app)
         .post('/api/auth/login')
         .send({ username, password: 'wrongpass' })
@@ -114,9 +114,9 @@ describe('Food Tracker API - Auth', function() {
     });
   });
 
-  describe('/api/auth/refresh', function() {
+  describe('/api/auth/refresh', () => {
 
-    it('should reject requests with no credentials', function() {
+    it('should reject requests with no credentials', () => {
       return chai.request(app)
         .post('/api/auth/refresh')
         .then(res => {
@@ -124,7 +124,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('should reject requests with an invalid token', function() {
+    it('should reject requests with an invalid token', () => {
       token = jwt.sign({ username, password }, 'Incorrect Secret');
       return chai.request(app)
         .post('/api/auth/refresh')
@@ -134,7 +134,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('should reject requests with an expired token', function() {
+    it('should reject requests with an expired token', () => {
       token = jwt.sign({ username, password }, JWT_SECRET, { subject: username, expiresIn: Math.floor(Date.now() / 1000) - 10 });
       return chai.request(app)
         .post('/api/auth/refresh')
@@ -144,7 +144,7 @@ describe('Food Tracker API - Auth', function() {
         });
     });
 
-    it('should return a valid auth token with a newer expiry date', function() {
+    it('should return a valid auth token with a newer expiry date', () => {
       const user = { username };
       const token = jwt.sign({ user }, JWT_SECRET, { subject: username, expiresIn: '1m' });
       const decoded = jwt.decode(token);

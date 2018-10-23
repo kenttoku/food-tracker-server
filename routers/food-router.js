@@ -17,7 +17,7 @@ router.get('/', (req, res, next) => {
   return Food.find(filter)
     .sort({ updatedAt: 'desc' })
     .then(results => {
-      results ? res.json(results.map(result => result.serialize())) : next();
+      results ? res.json(results) : next();
     })
     .catch(err => next(err));
 });
@@ -28,7 +28,7 @@ router.get('/:id', validateId, (req, res, next) => {
   const userId = req.user.id;
 
   return Food.findOne({ _id: id, userId })
-    .then(result => result ? res.json(result.serialize()) : next())
+    .then(result => result ? res.json(result) : next())
     .catch(err => next(err));
 });
 
@@ -42,7 +42,7 @@ router.post('/', validateName, (req, res, next) => {
       if (result) {
         res.status(201)
           .location(`${req.originalUrl}/${result.id}`)
-          .json(result.serialize());
+          .json(result);
       } else {
         next();
       }
@@ -58,7 +58,7 @@ router.put('/:id', validateId, validateName, (req, res, next) => {
 
   return Food.findOneAndUpdate({ _id: id, userId }, newFood, { new: true })
     .then(result => {
-      result ? res.json(result.serialize()) : next();
+      result ? res.json(result) : next();
     })
     .catch(err => next(err));
 });

@@ -12,7 +12,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('Food Tracker API - Users', function() {
+describe('Food Tracker API - Users', () => {
   const username = 'exampleUser';
   const password = 'examplePass';
 
@@ -20,12 +20,12 @@ describe('Food Tracker API - Users', function() {
   const anotherPass = 'anotherPass';
   const _id = '000000000000000000000001';
 
-  before(function() {
+  before(() => {
     return mongoose.connect(TEST_MONGODB_URI)
       .then(() => mongoose.connection.db.dropDatabase());
   });
 
-  beforeEach(function() {
+  beforeEach(() => {
     return User.createIndexes()
       .then(() => {
         return User.hashPassword(anotherPass)
@@ -37,17 +37,17 @@ describe('Food Tracker API - Users', function() {
       });
   });
 
-  afterEach(function() {
+  afterEach(() => {
     return mongoose.connection.db.dropDatabase();
   });
 
-  after(function() {
+  after(() => {
     return mongoose.disconnect();
   });
 
-  describe('/api/users', function() {
-    describe('POST', function() {
-      it('Should create a new user', function() {
+  describe('/api/users', () => {
+    describe('POST', () => {
+      it('Should create a new user', () => {
         const testUser = { username, password };
 
         let res;
@@ -76,7 +76,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with missing username', function() {
+      it('Should reject users with missing username', () => {
         const testUser = { password };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -87,7 +87,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with missing password', function() {
+      it('Should reject users with missing password', () => {
         const testUser = { username };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -98,7 +98,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with non-string username', function() {
+      it('Should reject users with non-string username', () => {
         const testUser = { username: 123456, password };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -109,7 +109,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with non-string password', function() {
+      it('Should reject users with non-string password', () => {
         const testUser = { username, password: 123456 };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -120,7 +120,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with non-trimmed username', function() {
+      it('Should reject users with non-trimmed username', () => {
         const testUser = { username: username + '  ', password };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -131,7 +131,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with non-trimmed password', function() {
+      it('Should reject users with non-trimmed password', () => {
         const testUser = { username, password: password + '  ' };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -142,7 +142,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with empty username', function() {
+      it('Should reject users with empty username', () => {
         const testUser = { username: '', password };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -153,7 +153,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with password less than 8 characters', function() {
+      it('Should reject users with password less than 8 characters', () => {
         const testUser = { username, password: 'short' };
         return chai.request(app).post('/api/users').send(testUser)
           .then(res => {
@@ -164,7 +164,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with password greater than 72 characters', function() {
+      it('Should reject users with password greater than 72 characters', () => {
         const longPassword = password.padEnd(73, 'a');
         const testUser = { username, password: longPassword };
         return chai.request(app).post('/api/users').send(testUser)
@@ -176,7 +176,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('Should reject users with duplicate username', function() {
+      it('Should reject users with duplicate username', () => {
         const testUser = { username, password };
         return chai.request(app).post('/api/users').send(testUser)
           .then(() => {
@@ -190,8 +190,8 @@ describe('Food Tracker API - Users', function() {
       });
     });
 
-    describe('PATCH', function() {
-      it('should change username', function() {
+    describe('PATCH', () => {
+      it('should change username', () => {
         return chai.request(app)
           .patch('/api/users')
           .send({
@@ -212,7 +212,7 @@ describe('Food Tracker API - Users', function() {
           });
       });
 
-      it('should not change username if there is a duplicate', function() {
+      it('should not change username if there is a duplicate', () => {
         const testUser = { username, password };
         return chai.request(app).post('/api/users').send(testUser)
           .then(() => {
