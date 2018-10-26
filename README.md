@@ -6,7 +6,7 @@ Food Tracker, as the name implies, tracks food on a points based system.
 The project originated with a friend, who was looking for ways to track the quality of his diet, in addition to the standard calories that most food and fitness trackers provide.
 
 ## Deployed Version
-(https://nameless-fjord-43314.herokuapp.com/)
+https://nameless-fjord-43314.herokuapp.com/
 
 ## Technologies used
 
