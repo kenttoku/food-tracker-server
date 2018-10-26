@@ -8,6 +8,12 @@ The project originated with a friend, who was looking for ways to track the qual
 ## Deployed Version
 https://nameless-fjord-43314.herokuapp.com/
 
+
+## Demo
+username: demouser
+
+password: demopass
+
 ## Technologies used
 
 ### Front End
