@@ -4,18 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "cover": "nyc --reporter=lcov npm test",
-    "start": "node index.js",
-    "test": "cross-env NODE_ENV=test mocha"
+    "start": "node src/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Kent Tokunaga",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.4",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
+    "graphql-yoga": "^1.16.7",
     "jsonwebtoken": "^8.3.0",
     "moment": "^2.22.2",
     "mongoose": "^5.3.3",
