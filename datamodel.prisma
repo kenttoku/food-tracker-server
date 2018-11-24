@@ -1,4 +1,22 @@
 type User {
   id: ID! @unique
+  email: String! @unique
+  password: String!
+  goal: Int!
+}
+
+type Food {
+  id: ID! @unique
+  user: User!
   name: String!
+  fruits: Float! @default(value: "0")
+  vegetables: Float! @default(value: "0")
+  wholeGrains: Float! @default(value: "0")
+  leanProteins: Float! @default(value: "0")
+  nutsAndSeeds: Float! @default(value: "0")
+  dairy: Float! @default(value: "0")
+  refinedGrains: Float! @default(value: "0")
+  fattyProteins: Float! @default(value: "0")
+  sweets: Float! @default(value: "0")
+  friedFoods: Float! @default(value: "0")
 }
