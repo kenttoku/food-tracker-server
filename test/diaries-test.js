@@ -16,7 +16,7 @@ chai.use(chaiHttp);
 const expect = chai.expect;
 const sandbox = sinon.createSandbox();
 
-describe('Food Tracker API - Diaries', () => {
+describe('Food Point API - Diaries', () => {
   let user;
   let token;
   before(() => {

@@ -11,7 +11,7 @@ const User = require('../models/user-model');
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('Food Tracker API - Auth', () => {
+describe('Food Point API - Auth', () => {
 
   let token;
   const _id = '000000000000000000000001';
@@ -40,7 +40,7 @@ describe('Food Tracker API - Auth', () => {
       .then(() => mongoose.disconnect());
   });
 
-  describe('Food Tracker /api/auth/login', () => {
+  describe('Food Point /api/auth/login', () => {
     it('Should return a valid auth token', () => {
       return chai.request(app)
         .post('/api/auth/login')

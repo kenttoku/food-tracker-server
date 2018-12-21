@@ -12,7 +12,7 @@ const expect = chai.expect;
 
 chai.use(chaiHttp);
 
-describe('Food Tracker API - Users', () => {
+describe('Food Point API - Users', () => {
   const username = 'exampleUser';
   const password = 'examplePass';
 
