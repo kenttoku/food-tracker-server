@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "dev": "nodemon index.js",
     "cover": "nyc --reporter=lcov npm test",
     "start": "node index.js",
     "test": "cross-env NODE_ENV=test mocha"
