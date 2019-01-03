@@ -1,4 +1,4 @@
-# Food Point
+# Food Point API
 
 > A simple point based food tracker
 
