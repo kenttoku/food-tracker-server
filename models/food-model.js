@@ -12,7 +12,7 @@ const foodSchema = new mongoose.Schema({
   refinedGrains: { type: Number, default: 0 },
   fattyProteins: { type: Number, default: 0 },
   sweets: { type: Number, default: 0 },
-  friedFoods: { type: Number, default: 0 }
+  friedFoods: { type: Number, default: 0 },
 });
 
 foodSchema.set('timestamps', true);
@@ -22,7 +22,7 @@ foodSchema.set('toJSON', {
   transform: (doc, result) => {
     delete result._id;
     delete result.__v;
-  }
+  },
 });
 
 module.exports = mongoose.model('Food', foodSchema);

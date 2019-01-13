@@ -23,19 +23,18 @@ router.get('/:yyyymmdd', validateDate, (req, res, next) => {
   const newDiary = { yyyymmdd, userId };
 
   return Diary.findOne(filter)
-    .then(result => {
+    .then((result) => {
       if (result) {
         return res.json(result);
-      } else {
-        return Diary.create(newDiary)
-          .then(result => {
-            if (result) {
-              res.json(result);
-            } else {
-              next();
-            }
-          });
       }
+      return Diary.create(newDiary)
+        .then((result) => {
+          if (result) {
+            res.json(result);
+          } else {
+            next();
+          }
+        });
     })
     .catch(err => next(err));
 });
@@ -43,12 +42,12 @@ router.get('/:yyyymmdd', validateDate, (req, res, next) => {
 router.patch('/:yyyymmdd', validateDate, (req, res, next) => {
   const { yyyymmdd } = req.params;
   const userId = req.user.id;
-  let { entries = [] } = req.body;
+  const { entries = [] } = req.body;
 
   return Diary.findOneAndUpdate(
     { yyyymmdd, userId },
     { $set: { entries } },
-    { new:true }
+    { new: true },
   )
     .then(result => res.json(result.populate()))
     .catch(err => next(err));

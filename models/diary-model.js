@@ -3,7 +3,7 @@ const { combineFood, calculatePoints } = require('../utils/points');
 
 const diarySchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  yyyymmdd:  { type: Number, required: true },
+  yyyymmdd: { type: Number, required: true },
   entries: [{
     food: {
       name: { type: String, required: true },
@@ -16,8 +16,8 @@ const diarySchema = new mongoose.Schema({
       refinedGrains: { type: Number, default: 0 },
       fattyProteins: { type: Number, default: 0 },
       sweets: { type: Number, default: 0 },
-      friedFoods: { type: Number, default: 0 }
-    }
+      friedFoods: { type: Number, default: 0 },
+    },
   }],
 });
 
@@ -28,14 +28,14 @@ diarySchema.set('toJSON', {
   transform: (doc, result) => {
     delete result._id;
     delete result.__v;
-  }
+  },
 });
 
-diarySchema.virtual('combined').get(function() {
+diarySchema.virtual('combined').get(function () {
   return combineFood(this.entries);
 });
 
-diarySchema.virtual('points').get(function() {
+diarySchema.virtual('points').get(function () {
   return calculatePoints(this.entries);
 });
 

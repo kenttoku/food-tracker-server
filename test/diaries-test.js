@@ -19,61 +19,53 @@ const sandbox = sinon.createSandbox();
 describe('Food Point API - Diaries', () => {
   let user;
   let token;
-  before(() => {
-    return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
-      .then(() => Food.createIndexes());
-  });
+  before(() => mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
+    .then(() => Food.createIndexes()));
 
-  beforeEach(() => {
-    return Promise.all([
-      User.insertMany(users),
-      Food.insertMany(food),
-      Diary.insertMany(diaries)
-    ])
-      .then(([users]) => {
-        user = users[0].serialize();
-        token = jwt.sign({ user }, JWT_SECRET, {
-          subject: user.username,
-          expiresIn: '1m',
-          algorithm: 'HS256'
-        });
+  beforeEach(() => Promise.all([
+    User.insertMany(users),
+    Food.insertMany(food),
+    Diary.insertMany(diaries),
+  ])
+    .then(([users]) => {
+      user = users[0].serialize();
+      token = jwt.sign({ user }, JWT_SECRET, {
+        subject: user.username,
+        expiresIn: '1m',
+        algorithm: 'HS256',
       });
-  });
+    }));
 
   afterEach(() => {
     sandbox.restore();
     return Promise.all([
       Diary.deleteMany(),
       Food.deleteMany(),
-      User.deleteMany()
+      User.deleteMany(),
     ]);
   });
 
-  after(() => {
-    return mongoose.connection.db.dropDatabase()
-      .then(() => mongoose.disconnect());
-  });
+  after(() => mongoose.connection.db.dropDatabase()
+    .then(() => mongoose.disconnect()));
 
   describe('GET /api/diaries', () => {
-    it('should return a list of diaries', () => {
-      return Promise.all([
-        Diary.find({ userId: user.id }),
-        chai.request(app).get('/api/diaries')
-          .set('Authorization', `Bearer ${token}`)
-      ])
-        .then(([data, res]) => {
-          expect(res).to.have.status(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('array');
-          expect(res.body).to.have.length(data.length);
-        });
-    });
+    it('should return a list of diaries', () => Promise.all([
+      Diary.find({ userId: user.id }),
+      chai.request(app).get('/api/diaries')
+        .set('Authorization', `Bearer ${token}`),
+    ])
+      .then(([data, res]) => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('array');
+        expect(res.body).to.have.length(data.length);
+      }));
 
     it('should catch errors and respond properly', () => {
       sandbox.stub(Diary.schema.options.toJSON, 'transform').throws('FakeError');
       return chai.request(app).get('/api/diaries')
         .set('Authorization', `Bearer ${token}`)
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -86,7 +78,7 @@ describe('Food Point API - Diaries', () => {
     it('should get the correct diary', () => {
       let data;
       return Diary.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app).get(`/api/diaries/${data.yyyymmdd}`)
             .set('Authorization', `Bearer ${token}`);
@@ -103,30 +95,27 @@ describe('Food Point API - Diaries', () => {
         });
     });
 
-    it('should create a new diary if it does not exist', () => {
-      return chai.request(app).get('/api/diaries/20000101')
-        .set('Authorization', `Bearer ${token}`)
-        .then((res) => {
-          expect(res).to.have.status(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body).to.have.all.keys('id', 'yyyymmdd', 'entries', 'userId', 'points', 'combined');
-        });
-    });
+    it('should create a new diary if it does not exist', () => chai.request(app).get('/api/diaries/20000101')
+      .set('Authorization', `Bearer ${token}`)
+      .then((res) => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body).to.have.all.keys('id', 'yyyymmdd', 'entries', 'userId', 'points', 'combined');
+      }));
 
 
     it('should catch errors and respond properly', () => {
       sandbox.stub(Diary.schema.options.toJSON, 'transform').throws('FakeError');
       return chai.request(app).get('/api/diaries/20000101')
         .set('Authorization', `Bearer ${token}`)
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.message).to.equal('Internal Server Error');
         });
     });
-
   });
 
   describe('PATCH /api/diaries/:yyyymmdd', () => {
@@ -134,14 +123,14 @@ describe('Food Point API - Diaries', () => {
       const updateField = { entries: [] };
       let data;
       return Diary.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app)
             .patch(`/api/diaries/${data.yyyymmdd}`)
             .set('Authorization', `Bearer ${token}`)
             .send(updateField);
         })
-        .then(function(res) {
+        .then((res) => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('object');
@@ -155,12 +144,10 @@ describe('Food Point API - Diaries', () => {
     it('should throw an error for invalid date', () => {
       const updateField = { entries: [] };
       return Diary.findOne({ userId: user.id })
-        .then(() => {
-          return chai.request(app)
-            .patch('/api/diaries/20003030')
-            .set('Authorization', `Bearer ${token}`)
-            .send(updateField);
-        })
+        .then(() => chai.request(app)
+          .patch('/api/diaries/20003030')
+          .set('Authorization', `Bearer ${token}`)
+          .send(updateField))
         .then((res) => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -173,14 +160,14 @@ describe('Food Point API - Diaries', () => {
       const updateField = { entries: [] };
       let data;
       return Diary.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app)
             .patch(`/api/diaries/${data.yyyymmdd}`)
             .set('Authorization', `Bearer ${token}`)
             .send(updateField);
         })
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -188,5 +175,4 @@ describe('Food Point API - Diaries', () => {
         });
     });
   });
-
 });

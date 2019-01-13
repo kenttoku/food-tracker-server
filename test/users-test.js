@@ -1,8 +1,8 @@
-const app = require('../index');
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const app = require('../index');
 
 const { TEST_MONGODB_URI, JWT_SECRET } = require('../config');
 
@@ -20,30 +20,20 @@ describe('Food Point API - Users', () => {
   const anotherPass = 'anotherPass';
   const _id = '000000000000000000000001';
 
-  before(() => {
-    return mongoose.connect(TEST_MONGODB_URI)
-      .then(() => mongoose.connection.db.dropDatabase());
-  });
+  before(() => mongoose.connect(TEST_MONGODB_URI)
+    .then(() => mongoose.connection.db.dropDatabase()));
 
-  beforeEach(() => {
-    return User.createIndexes()
-      .then(() => {
-        return User.hashPassword(anotherPass)
-          .then(digest => User.create({
-            _id,
-            username: anotherUser,
-            password: digest
-          }));
-      });
-  });
+  beforeEach(() => User.createIndexes()
+    .then(() => User.hashPassword(anotherPass)
+      .then(digest => User.create({
+        _id,
+        username: anotherUser,
+        password: digest,
+      }))));
 
-  afterEach(() => {
-    return mongoose.connection.db.dropDatabase();
-  });
+  afterEach(() => mongoose.connection.db.dropDatabase());
 
-  after(() => {
-    return mongoose.disconnect();
-  });
+  after(() => mongoose.disconnect());
 
   describe('/api/users', () => {
     describe('POST', () => {
@@ -55,7 +45,7 @@ describe('Food Point API - Users', () => {
           .request(app)
           .post('/api/users')
           .send(testUser)
-          .then(_res => {
+          .then((_res) => {
             res = _res;
             expect(res).to.have.status(201);
             expect(res.body).to.be.an('object');
@@ -66,12 +56,12 @@ describe('Food Point API - Users', () => {
 
             return User.findOne({ username });
           })
-          .then(user => {
+          .then((user) => {
             expect(user).to.exist;
             expect(user.id).to.equal(res.body.id);
             return user.validatePassword(password);
           })
-          .then(isValid => {
+          .then((isValid) => {
             expect(isValid).to.be.true;
           });
       });
@@ -79,7 +69,7 @@ describe('Food Point API - Users', () => {
       it('Should reject users with missing username', () => {
         const testUser = { password };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Missing field');
@@ -90,7 +80,7 @@ describe('Food Point API - Users', () => {
       it('Should reject users with missing password', () => {
         const testUser = { username };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Missing field');
@@ -101,7 +91,7 @@ describe('Food Point API - Users', () => {
       it('Should reject users with non-string username', () => {
         const testUser = { username: 123456, password };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Incorrect field type: expected string');
@@ -112,7 +102,7 @@ describe('Food Point API - Users', () => {
       it('Should reject users with non-string password', () => {
         const testUser = { username, password: 123456 };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Incorrect field type: expected string');
@@ -121,9 +111,9 @@ describe('Food Point API - Users', () => {
       });
 
       it('Should reject users with non-trimmed username', () => {
-        const testUser = { username: username + '  ', password };
+        const testUser = { username: `${username}  `, password };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Cannot start or end with whitespace');
@@ -132,9 +122,9 @@ describe('Food Point API - Users', () => {
       });
 
       it('Should reject users with non-trimmed password', () => {
-        const testUser = { username, password: password + '  ' };
+        const testUser = { username, password: `${password}  ` };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Cannot start or end with whitespace');
@@ -145,7 +135,7 @@ describe('Food Point API - Users', () => {
       it('Should reject users with empty username', () => {
         const testUser = { username: '', password };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Must be at least 1 characters long');
@@ -156,7 +146,7 @@ describe('Food Point API - Users', () => {
       it('Should reject users with password less than 8 characters', () => {
         const testUser = { username, password: 'short' };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Must be at least 8 characters long');
@@ -168,7 +158,7 @@ describe('Food Point API - Users', () => {
         const longPassword = password.padEnd(73, 'a');
         const testUser = { username, password: longPassword };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(res => {
+          .then((res) => {
             expect(res).to.have.status(422);
             expect(res.body.reason).to.equal('ValidationError');
             expect(res.body.message).to.equal('Must be at most 72 characters long');
@@ -179,69 +169,60 @@ describe('Food Point API - Users', () => {
       it('Should reject users with duplicate username', () => {
         const testUser = { username, password };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(() => {
-            return chai.request(app).post('/api/users').send(testUser);
-          })
-          .then(res => {
+          .then(() => chai.request(app).post('/api/users').send(testUser))
+          .then((res) => {
             expect(res).to.have.status(400);
             expect(res.body.message).to.equal('The username already exists');
           });
-
       });
     });
 
     describe('PATCH', () => {
-      it('should change username', () => {
-        return chai.request(app)
-          .patch('/api/users')
-          .send({
-            username: anotherUser,
-            password: anotherPass,
-            newUsername: 'newUserName'
-          })
-          .then(res => {
-            expect(res).to.have.status(200);
-            expect(res.body).to.be.an('object');
-            expect(res.body.authToken).to.be.a('string');
+      it('should change username', () => chai.request(app)
+        .patch('/api/users')
+        .send({
+          username: anotherUser,
+          password: anotherPass,
+          newUsername: 'newUserName',
+        })
+        .then((res) => {
+          expect(res).to.have.status(200);
+          expect(res.body).to.be.an('object');
+          expect(res.body.authToken).to.be.a('string');
 
-            const payload = jwt.verify(res.body.authToken, JWT_SECRET);
+          const payload = jwt.verify(res.body.authToken, JWT_SECRET);
 
-            expect(payload.user).to.not.have.property('password');
-            expect(payload.user.id).to.equal(_id);
-            expect(payload.user.username).to.equal('newUserName');
-          });
-      });
+          expect(payload.user).to.not.have.property('password');
+          expect(payload.user.id).to.equal(_id);
+          expect(payload.user.username).to.equal('newUserName');
+        }));
 
       it('should not change username if there is a duplicate', () => {
         const testUser = { username, password };
         return chai.request(app).post('/api/users').send(testUser)
-          .then(() => {
-            return chai.request(app)
-              .patch('/api/users')
-              .send({
-                username: anotherUser,
-                password: anotherPass,
-                newUsername: username
-              });
-          })
-          .then(res => {
+          .then(() => chai.request(app)
+            .patch('/api/users')
+            .send({
+              username: anotherUser,
+              password: anotherPass,
+              newUsername: username,
+            }))
+          .then((res) => {
             expect(res).to.have.status(400);
             expect(res.body.message).to.equal('The username already exists');
           });
       });
 
-      it('should throw an error for missing newUsername field', () => {
-        return chai.request(app)
-          .patch('/api/users')
-          .send({
-            username: anotherUser,
-            password: anotherPass,
-          })
-          .then(res => {
-            expect(res).to.have.status(400);
-            expect(res.body.message).to.equal('Missing `newUsername` in request body');
-          });
-      });
+      it('should throw an error for missing newUsername field', () => chai.request(app)
+        .patch('/api/users')
+        .send({
+          username: anotherUser,
+          password: anotherPass,
+        })
+        .then((res) => {
+          expect(res).to.have.status(400);
+          expect(res.body.message).to.equal('Missing `newUsername` in request body');
+        }));
     });
   });
 });

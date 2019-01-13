@@ -53,11 +53,11 @@ app.use((err, req, res, next) => {
 
 
 if (require.main === module) {
-  mongoose.connect(MONGODB_URI, { useNewUrlParser:true })
+  mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
     .then(() => console.log('Database Connected'))
     .catch(err => console.error(err));
 
-  app.listen(PORT, function() {
+  app.listen(PORT, function () {
     console.info(`Server listening on ${this.address().port}`);
   }).on('error', err => console.error(err));
 }

@@ -10,11 +10,11 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 router.get('/', (req, res, next) => {
   const userId = req.user.id;
-  let filter = { userId };
+  const filter = { userId };
 
   return Food.find(filter)
     .sort({ updatedAt: 'desc' })
-    .then(results => {
+    .then((results) => {
       results ? res.json(results) : next();
     })
     .catch(err => next(err));
@@ -25,7 +25,7 @@ router.get('/:id', validateId, (req, res, next) => {
   const userId = req.user.id;
 
   return Food.findOne({ _id: id, userId })
-    .then(result => result ? res.json(result) : next())
+    .then(result => (result ? res.json(result) : next()))
     .catch(err => next(err));
 });
 
@@ -34,7 +34,7 @@ router.post('/', validateName, (req, res, next) => {
   const newFood = { ...req.body, userId };
 
   return Food.create(newFood)
-    .then(result => {
+    .then((result) => {
       if (result) {
         res.status(201)
           .location(`${req.originalUrl}/${result.id}`)
@@ -52,7 +52,7 @@ router.put('/:id', validateId, validateName, (req, res, next) => {
   const newFood = { ...req.body, userId };
 
   return Food.findOneAndUpdate({ _id: id, userId }, newFood, { new: true })
-    .then(result => {
+    .then((result) => {
       result ? res.json(result) : next();
     })
     .catch(err => next(err));

@@ -20,7 +20,7 @@ router.post('/refresh', jwtAuth, (req, res) => {
 
 router.post('/demo', (req, res) => {
   User.findOne({ username: 'demouser' })
-    .then(user => {
+    .then((user) => {
       const authToken = createAuthToken(user.serialize());
       return res.json({ authToken });
     });

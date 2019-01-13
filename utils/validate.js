@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const moment = require('moment');
 
-const validateId = function(req, res, next) {
+const validateId = function (req, res, next) {
   const { id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(id)) {
     const err = new Error('The `id` is not valid');
@@ -11,7 +11,7 @@ const validateId = function(req, res, next) {
   return next();
 };
 
-const validateName = function(req, res, next) {
+const validateName = function (req, res, next) {
   const { name } = req.body;
   if (!name) {
     const err = new Error('Missing `name` in request body');
@@ -21,7 +21,7 @@ const validateName = function(req, res, next) {
   return next();
 };
 
-const validateNewUsermame = function(req, res, next) {
+const validateNewUsermame = function (req, res, next) {
   const { newUsername } = req.body;
   if (!newUsername) {
     const err = new Error('Missing `newUsername` in request body');
@@ -31,7 +31,7 @@ const validateNewUsermame = function(req, res, next) {
   return next();
 };
 
-const validateDate = function(req, res, next) {
+const validateDate = function (req, res, next) {
   const { yyyymmdd } = req.params;
 
   if (moment(yyyymmdd, 'YYYYMMDD').format() === 'Invalid date') {
@@ -43,7 +43,7 @@ const validateDate = function(req, res, next) {
   return next();
 };
 
-const validateUserFields = function(req, res, next) {
+const validateUserFields = function (req, res, next) {
   const fields = ['username', 'password'];
 
   const missingField = fields.find(field => !(field in req.body));
@@ -53,12 +53,12 @@ const validateUserFields = function(req, res, next) {
       code: 422,
       reason: 'ValidationError',
       message: 'Missing field',
-      location: missingField
+      location: missingField,
     });
   }
 
   const nonStringField = fields.find(
-    field => field in req.body && typeof req.body[field] !== 'string'
+    field => field in req.body && typeof req.body[field] !== 'string',
   );
 
   if (nonStringField) {
@@ -66,12 +66,12 @@ const validateUserFields = function(req, res, next) {
       code: 422,
       reason: 'ValidationError',
       message: 'Incorrect field type: expected string',
-      location: nonStringField
+      location: nonStringField,
     });
   }
 
   const nonTrimmedField = fields.find(
-    field => req.body[field].trim() !== req.body[field]
+    field => req.body[field].trim() !== req.body[field],
   );
 
   if (nonTrimmedField) {
@@ -79,23 +79,23 @@ const validateUserFields = function(req, res, next) {
       code: 422,
       reason: 'ValidationError',
       message: 'Cannot start or end with whitespace',
-      location: nonTrimmedField
+      location: nonTrimmedField,
     });
   }
 
   const minFields = {
     username: 1,
-    password: 8
+    password: 8,
   };
 
   const tooSmallField = Object.keys(minFields).find(
-    field => req.body[field].length < minFields[field]
+    field => req.body[field].length < minFields[field],
   );
 
   const maxFields = { password: 72 };
 
   const tooLargeField = Object.keys(maxFields).find(
-    field => req.body[field].length > maxFields[field]
+    field => req.body[field].length > maxFields[field],
   );
 
   if (tooSmallField || tooLargeField) {
@@ -105,7 +105,7 @@ const validateUserFields = function(req, res, next) {
       message: tooSmallField
         ? `Must be at least ${minFields[tooSmallField]} characters long`
         : `Must be at most ${maxFields[tooLargeField]} characters long`,
-      location: tooSmallField || tooLargeField
+      location: tooSmallField || tooLargeField,
     });
   }
   return next();
@@ -115,5 +115,5 @@ module.exports = {
   validateName,
   validateDate,
   validateUserFields,
-  validateNewUsermame
+  validateNewUsermame,
 };

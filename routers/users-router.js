@@ -6,26 +6,24 @@ const router = express.Router();
 const User = require('../models/user-model');
 const {
   validateNewUsermame,
-  validateUserFields
+  validateUserFields,
 } = require('../utils/validate');
 
 router.post('/', validateUserFields, (req, res, next) => {
   const { username, password } = req.body;
 
   return User.hashPassword(password)
-    .then(digest => {
+    .then((digest) => {
       const newUser = {
         username,
-        password: digest
+        password: digest,
       };
       return User.create(newUser);
     })
-    .then(user => {
-      return res.status(201)
-        .location(`/api/users/${user.id}`)
-        .json(user.serialize());
-    })
-    .catch(err => {
+    .then(user => res.status(201)
+      .location(`/api/users/${user.id}`)
+      .json(user.serialize()))
+    .catch((err) => {
       if (err.code === 11000) {
         err = new Error('The username already exists');
         err.status = 400;
@@ -40,19 +38,18 @@ router.patch('/', passport.authenticate('local', { session: false, failWithError
   const newValues = {
     username: newUsername,
     goal,
-    email
+    email,
   };
 
-  return User.findOneAndUpdate({ _id: id },  { $set: newValues }, { new: true })
-    .then(result => {
+  return User.findOneAndUpdate({ _id: id }, { $set: newValues }, { new: true })
+    .then((result) => {
       if (result) {
         const authToken = createAuthToken(result.serialize());
         return res.json({ authToken });
-      } else {
-        next();
       }
+      next();
     })
-    .catch(err => {
+    .catch((err) => {
       if (err.code === 11000) {
         err = new Error('The username already exists');
         err.status = 400;

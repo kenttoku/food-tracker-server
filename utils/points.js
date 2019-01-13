@@ -8,7 +8,7 @@ const pointsTable = {
   refinedGrains: [0, -1, -2, -4, -6, -8, -10, -2],
   fattyProteins: [0, -1, -2, -4, -6, -8, -10, -2],
   sweets: [0, -2, -4, -6, -8, -10, -12, -2],
-  friedFoods: [0, -2, -4, -6, -8, -10, -12, -2]
+  friedFoods: [0, -2, -4, -6, -8, -10, -12, -2],
 };
 
 const combineFood = (entries) => {
@@ -24,7 +24,7 @@ const combineFood = (entries) => {
     sweets: 0,
     friedFoods: 0,
   };
-  entries.forEach(entry => {
+  entries.forEach((entry) => {
     combinedFood.fruits += entry.food.fruits;
     combinedFood.vegetables += entry.food.vegetables;
     combinedFood.wholeGrains += entry.food.wholeGrains;
@@ -53,9 +53,9 @@ const calculatePoints = (entries) => {
     'refinedGrains',
     'fattyProteins',
     'sweets',
-    'friedFoods'
+    'friedFoods',
   ];
-  categories.forEach(category => {
+  categories.forEach((category) => {
     const servings = Math.trunc(combined[category]);
     if (servings <= 6) {
       points += pointsTable[category][servings];

@@ -19,85 +19,77 @@ const sandbox = sinon.createSandbox();
 describe('Food Point API - Food', () => {
   let user;
   let token;
-  before(() => {
-    return mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
-      .then(() => Food.createIndexes());
-  });
+  before(() => mongoose.connect(TEST_MONGODB_URI, { useNewUrlParser: true })
+    .then(() => Food.createIndexes()));
 
-  beforeEach(() => {
-    return Promise.all([
-      User.insertMany(users),
-      Food.insertMany(food)
-    ])
-      .then(([users]) => {
-        user = users[0].serialize();
-        token = jwt.sign({ user }, JWT_SECRET, {
-          subject: user.username,
-          expiresIn: '1m',
-          algorithm: 'HS256'
-        });
+  beforeEach(() => Promise.all([
+    User.insertMany(users),
+    Food.insertMany(food),
+  ])
+    .then(([users]) => {
+      user = users[0].serialize();
+      token = jwt.sign({ user }, JWT_SECRET, {
+        subject: user.username,
+        expiresIn: '1m',
+        algorithm: 'HS256',
       });
-  });
+    }));
 
   afterEach(() => {
     sandbox.restore();
     return Promise.all([
       Food.deleteMany(),
-      User.deleteMany()
+      User.deleteMany(),
     ]);
   });
 
-  after(() => {
-    return mongoose.connection.db.dropDatabase()
-      .then(() => mongoose.disconnect());
-  });
+  after(() => mongoose.connection.db.dropDatabase()
+    .then(() => mongoose.disconnect()));
 
   describe('GET /api/food', () => {
-    it('should return a list of food', () => {
-      return Promise.all([
-        Food.find({ userId: user.id }).sort({ updatedAt: 'desc' }),
-        chai.request(app).get('/api/food')
-          .set('Authorization', `Bearer ${token}`)
-      ])
-        .then(([data, res]) => {
-          expect(res).to.have.status(200);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('array');
-          expect(res.body).to.have.length(data.length);
-          res.body.forEach((item, i) => {
-            expect(item).to.be.an('object');
-            expect(item).to.have.all.keys(
-              'id',
-              'name',
-              'userId',
-              'fruits',
-              'vegetables',
-              'wholeGrains',
-              'leanProteins',
-              'nutsAndSeeds',
-              'dairy',
-              'refinedGrains',
-              'fattyProteins',
-              'sweets',
-              'friedFoods',
-              'createdAt',
-              'updatedAt'
-            );
-            expect(item.id).to.equal(data[i].id);
-            expect(item.name).to.equal(data[i].name);
-            expect(item.userId).to.equal(data[i].userId.toString());
-            expect(new Date(item.createdAt)).to.eql(data[i].createdAt);
-            expect(new Date(item.updatedAt)).to.eql(data[i].updatedAt);
-          });
+    it('should return a list of food', () => Promise.all([
+      Food.find({ userId: user.id }).sort({ updatedAt: 'desc' }),
+      chai.request(app).get('/api/food')
+        .set('Authorization', `Bearer ${token}`),
+    ])
+      .then(([data, res]) => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.a('array');
+        expect(res.body).to.have.length(data.length);
+        res.body.forEach((item, i) => {
+          expect(item).to.be.an('object');
+          expect(item).to.have.all.keys(
+            'id',
+            'name',
+            'userId',
+            'fruits',
+            'vegetables',
+            'wholeGrains',
+            'leanProteins',
+            'nutsAndSeeds',
+            'dairy',
+            'refinedGrains',
+            'fattyProteins',
+            'sweets',
+            'friedFoods',
+            'createdAt',
+            'updatedAt',
+          );
+          expect(item.id).to.equal(data[i].id);
+          expect(item.name).to.equal(data[i].name);
+          expect(item.userId).to.equal(data[i].userId.toString());
+          expect(new Date(item.createdAt)).to.eql(data[i].createdAt);
+          expect(new Date(item.updatedAt)).to.eql(data[i].updatedAt);
         });
-    });
+      }));
 
     it('should catch errors and respond properly', () => {
       sandbox.stub(Food.schema.options.toJSON, 'transform').throws('FakeError');
 
       return chai.request(app).get('/api/food')
         .set('Authorization', `Bearer ${token}`)
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -110,7 +102,7 @@ describe('Food Point API - Food', () => {
     it('should get the correct food', () => {
       let data;
       return Food.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app).get(`/api/food/${data.id}`)
             .set('Authorization', `Bearer ${token}`);
@@ -134,7 +126,7 @@ describe('Food Point API - Food', () => {
             'sweets',
             'friedFoods',
             'createdAt',
-            'updatedAt'
+            'updatedAt',
           );
           expect(res.body.id).to.equal(data.id);
           expect(res.body.name).to.equal(data.name);
@@ -145,18 +137,14 @@ describe('Food Point API - Food', () => {
     });
 
 
-    it('should not return for invalid id', () => {
-      return Food.findOne({ userId: user.id })
-        .then(() => {
-          return chai.request(app).get('/api/food/INVALID')
-            .set('Authorization', `Bearer ${token}`);
-        })
-        .then((res) => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-        });
-    });
+    it('should not return for invalid id', () => Food.findOne({ userId: user.id })
+      .then(() => chai.request(app).get('/api/food/INVALID')
+        .set('Authorization', `Bearer ${token}`))
+      .then((res) => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+      }));
 
 
     it('should catch errors and respond properly', () => {
@@ -164,12 +152,12 @@ describe('Food Point API - Food', () => {
 
       let data;
       return Food.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app).get(`/api/food/${data.id}`)
             .set('Authorization', `Bearer ${token}`);
         })
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -207,11 +195,11 @@ describe('Food Point API - Food', () => {
             'sweets',
             'friedFoods',
             'createdAt',
-            'updatedAt'
+            'updatedAt',
           );
           return Food.findOne({ _id: body.id, userId: user.id });
         })
-        .then(data => {
+        .then((data) => {
           expect(body.id).to.equal(data.id);
           expect(body.name).to.equal(data.name);
           expect(body.userId).to.equal(data.userId.toString());
@@ -242,7 +230,7 @@ describe('Food Point API - Food', () => {
         .post('/api/food')
         .set('Authorization', `Bearer ${token}`)
         .send(newItem)
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -253,11 +241,10 @@ describe('Food Point API - Food', () => {
 
   describe('PUT /api/food/:id', () => {
     it('should update an item', () => {
-
       const updateItem = { name: 'Updated Name' };
       let data;
       return Food.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app)
             .put(`/api/food/${data.id}`)
@@ -283,7 +270,7 @@ describe('Food Point API - Food', () => {
             'sweets',
             'friedFoods',
             'createdAt',
-            'updatedAt'
+            'updatedAt',
           );
           expect(res.body.id).to.equal(data.id);
           expect(res.body.name).to.equal(updateItem.name);
@@ -299,14 +286,14 @@ describe('Food Point API - Food', () => {
       const updateItem = { name: 'Updated Name' };
       let data;
       return Food.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app)
             .put(`/api/food/${data.id}`)
             .set('Authorization', `Bearer ${token}`)
             .send(updateItem);
         })
-        .then(res => {
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -319,7 +306,7 @@ describe('Food Point API - Food', () => {
     it('should delete an item', () => {
       let data;
       return Food.findOne({ userId: user.id })
-        .then(_data => {
+        .then((_data) => {
           data = _data;
           return chai.request(app)
             .delete(`/api/food/${data.id}`)
@@ -330,7 +317,7 @@ describe('Food Point API - Food', () => {
           expect(res.body).to.be.empty;
           return Food.countDocuments({ _id: data.id });
         })
-        .then(count => {
+        .then((count) => {
           expect(count).to.equal(0);
         });
     });
@@ -338,12 +325,10 @@ describe('Food Point API - Food', () => {
     it('should catch errors and respond properly', () => {
       sandbox.stub(express.response, 'sendStatus').throws('FakeError');
       return Food.findOne()
-        .then(data => {
-          return chai.request(app)
-            .delete(`/api/food/${data.id}`)
-            .set('Authorization', `Bearer ${token}`);
-        })
-        .then(res => {
+        .then(data => chai.request(app)
+          .delete(`/api/food/${data.id}`)
+          .set('Authorization', `Bearer ${token}`))
+        .then((res) => {
           expect(res).to.have.status(500);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
